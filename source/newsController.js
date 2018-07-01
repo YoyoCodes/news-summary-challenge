@@ -1,6 +1,9 @@
 var NEWSCONTROLLERMODULE = (function(exports) {
+  var currentNewsController;
+
   function NewsController() {
     this.news = [];
+    currentNewsController = this
   };
 
   NewsController.prototype.getnewsContainerDiv = function() {
@@ -23,6 +26,13 @@ var NEWSCONTROLLERMODULE = (function(exports) {
     request.send();
   };
 
+  NewsController.prototype.parseGuardiansResponseJSON = function(responseJSON) {
+    var dataArray = responseJSON.response.results
+    return dataArray.map(function(news) {
+      return new News(news.webTitle, news.webUrl, 'summary', news.fields.thumbnail)
+    });
+  };
+
   NewsController.prototype.getSummary = function(news) {
     var url = 'https://api.aylien.com/api/v1/summarize';
     var parameters = `?sentences_number=4&url=${news.url}`;
@@ -38,13 +48,6 @@ var NEWSCONTROLLERMODULE = (function(exports) {
     };
 
     request.send();
-  };
-
-  NewsController.prototype.parseGuardiansResponseJSON = function(responseJSON) {
-    var dataArray = responseJSON.response.results
-    return dataArray.map(function(news) {
-      return new News(news.webTitle, news.webUrl, 'summary', news.fields.thumbnail)
-    });
   };
 
   NewsController.prototype.parseAylienResponseJSON = function(responseJSON) {
